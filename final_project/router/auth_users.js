@@ -106,8 +106,53 @@ const authenticatedUser = (username, password) => {
 // Add a book review
 regd_users.put("/auth/review/:isbn", (req, res) => {
   //Write your code here
-  return res.status(300).json({message: "Yet to be implemented"});
+  const { review } = req.body;
+  const isbn = req.params.isbn;
+  let book = Object.values(books).filter((book) => book.isbn === isbn);
+
+  const { authorization } = req.session;
+ if (req.session) {
+
+    let reviewObj = {
+        "isbn":isbn,
+        "user" : authorization.username,
+        "review": review
+      }
+    
+     reviews.push(reviewObj);
+
+     console.log(reviewObj);
+     console.log(reviews);
+    
+
+    return res.status(200).send("review added scuccessfully");
+} else {
+    return res.status(401).json({ message: "Invalid Login. Check username and password", reviews });
+}
+
 });
+
+
+// Add a book review
+regd_users.delete("/auth/review/:isbn", (req, res) => {
+    //Write your code here
+    const { authorization } = req.session;
+
+   if (req.session) {
+  
+    reviews = Object.values(reviews).filter((review) => review.user !== authorization.username);
+      
+       console.log(reviews);
+  
+      return res.status(200).send("review deleted scuccessfully");
+  } else {
+      return res.status(401).json({ message: "Invalid Login. Check username and password", reviews });
+  }
+  
+  });
+
+
+  
 
 module.exports.authenticatedUser = authenticatedUser;
 module.exports.authenticated = regd_users;
